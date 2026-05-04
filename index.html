@@ -9,21 +9,29 @@
 <body>
 <div>جاري التحميل...</div>
 <script>
-(function(){
-  try{
+(async function(){
+  try {
     localStorage.setItem('fb_uid', JSON.stringify('u_1777852421371_a6muud'));
     Object.keys(localStorage).forEach(function(k){
       if(k.indexOf('bex_')===0||k.indexOf('binc_')===0||k.indexOf('bsav_')===0){
         try{
-          var v=JSON.parse(localStorage.getItem(k));
-          if(v&&typeof v==='object'&&!Array.isArray(v)&&Array.isArray(v.data)){
-            localStorage.setItem(k, JSON.stringify(v.data));
+          var p=JSON.parse(localStorage.getItem(k));
+          if(p&&typeof p==='object'&&!Array.isArray(p)&&Array.isArray(p.data)){
+            localStorage.setItem(k, JSON.stringify(p.data));
           }
         }catch(e){}
       }
     });
-  }catch(e){}
-  window.location.replace('./app.html');
+    const r = await fetch('./app.html?v=' + Date.now());
+    let html = await r.text();
+    const patch = '<scr'+'ipt>(function(){var orig=localStorage.setItem.bind(localStorage);localStorage.setItem=function(k,v){if(k&&(k.indexOf("bex_")===0||k.indexOf("binc_")===0||k.indexOf("bsav_")===0)){try{var p=JSON.parse(v);if(p&&typeof p==="object"&&!Array.isArray(p)&&Array.isArray(p.data)){v=JSON.stringify(p.data);}}catch(e){}}return orig(k,v);};})();</scr'+'ipt>';
+    html = html.replace('<head>', '<head>' + patch);
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(e) {
+    window.location.href = './app.html';
+  }
 })();
 </script>
 </body>
